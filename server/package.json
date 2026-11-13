@@ -9,7 +9,7 @@
     "dev": "nodemon app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Tommy Brits",
   "license": "ISC",
   "type": "module",
   "dependencies": {
