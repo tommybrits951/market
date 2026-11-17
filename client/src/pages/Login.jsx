@@ -33,6 +33,7 @@ export default function Login() {
         password: formData.password,
       });
       // Setting auth makes the Public layout redirect to the dashboard
+      console.log(data);
       setAuth(data);
     } catch (err) {
       setError(err.response?.data?.message || "Sign in failed");

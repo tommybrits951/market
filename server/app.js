@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 import connectDB from "./config/connectDB.js";
 import userRouter from "./routes/userRoutes.js";
+import imageRouter from "./routes/imageRoutes.js";
 
 const PORT = process.env.PORT || 9000;
 const app = express();
@@ -23,7 +24,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(fileUpload());
 app.use("/users", userRouter);
-
+app.use("/images", imageRouter);
 mongoose.connection.on("open", () => {
   console.log("connected to database");
   app.listen(PORT, () => {

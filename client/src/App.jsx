@@ -6,11 +6,14 @@ import Private from "./layouts/Private";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import PhotoUpload from "./pages/PhotoUpload";
 function App() {
   return (
     <Routes>
       <Route element={<Private />} path="/">
         <Route element={<Dashboard />} path="/" />
+        <Route element={<PhotoUpload />} path="/upload" />
+        <Route element={<PhotoUpload profile />} path="/upload/profile" />
       </Route>
       <Route element={<Public />} path="/public">
         <Route element={<Login />} path="/public/login" />
