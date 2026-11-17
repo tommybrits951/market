@@ -3,14 +3,16 @@ import axios from "../utils/axios";
 
 export default function useAuth() {
   const [auth, setAuth] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // Try to restore the session once on mount (refresh-token cookie).
   useEffect(() => {
-    auth === null &&
-      axios
-        .get("/users/refresh")
-        .then((res) => setAuth(res.data))
-        .catch((err) => console.log(err));
-  }, [auth, setAuth]);
+    axios
+      .get("/users/refresh")
+      .then((res) => setAuth(res.data))
+      .catch(() => setAuth(null))
+      .finally(() => setLoading(false));
+  }, []);
 
-  return { auth, setAuth };
+  return { auth, setAuth, loading };
 }

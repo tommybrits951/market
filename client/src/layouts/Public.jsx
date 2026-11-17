@@ -3,10 +3,13 @@ import MarketContext from "../context/MarketContext";
 import { Outlet, Navigate } from "react-router";
 
 export default function Public() {
-  const { auth } = useContext(MarketContext);
+  const { auth, loading } = useContext(MarketContext);
 
-  if (auth !== null) {
-    return <Navigate to={"/"} />;
+  if (loading) return null;
+
+  if (auth) {
+    return <Navigate to="/" replace />;
   }
+
   return <Outlet />;
 }

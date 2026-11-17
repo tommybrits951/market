@@ -25,6 +25,53 @@ const REGISTER_FIELDS = [
   "location",
 ];
 
+// Defaults for a new account. A function (not a constant object) so the
+// timestamps are taken at registration time, not when the server started.
+function userTemplate(now = new Date()) {
+  return {
+    location: {
+      city: "",
+      state: "",
+      country: "US",
+      postal: "",
+    },
+    avatar: "",
+    coverImage: "",
+    website: "",
+    relationshipStatus: "single",
+    isActive: true,
+    isBanned: false,
+    passwordChangedAt: now,
+    lastLoginAt: now,
+    lastActiveAt: now,
+    bio: "",
+    gender: "private",
+    privacy: {
+      profile: "public",
+      email: "friends",
+      phone: "friends",
+      dateOfBirth: "public",
+      location: "public",
+      friendsList: "friends",
+      work: "friends",
+      education: "public",
+      relationshipStatus: "public",
+      allowFriendRequests: "everyone",
+      showOnlineStatus: true,
+    },
+    consent: {
+      termsAcceptedAt: now,
+      privacyPolicyAcceptedAt: now,
+    },
+  };
+}
+
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: true,
+  sameSite: "None",
+};
+
 function buildToken(user, exp, secret) {
   const payload = {
     _id: user._id,
@@ -32,20 +79,44 @@ function buildToken(user, exp, secret) {
     age: user.age,
     email: user.email,
   };
-  const options = {
-    expiresIn: exp,
-  };
-  return jwt.sign(payload, secret, options);
+  return jwt.sign(payload, secret, { expiresIn: exp });
+}
+
+// Sets a fresh refresh-token cookie and returns the body every auth endpoint
+// sends: { user, accessToken }. user.toJSON() strips the password.
+function startSession(res, user) {
+  const refreshToken = buildToken(
+    user,
+    REFRESH_EXPIRES,
+    process.env.JWT_SECRET_REFRESH,
+  );
+  res.cookie("jwt", refreshToken, {
+    ...COOKIE_OPTIONS,
+    maxAge: REFRESH_COOKIE_MAX_AGE,
+  });
+  const accessToken = buildToken(
+    user,
+    ACCESS_EXPIRES,
+    process.env.JWT_SECRET_ACCESS,
+  );
+  return { user, accessToken };
 }
 
 async function register(req, res) {
   try {
-    const { email, password } = req.body;
+    const { email, password, firstName, lastName, postal, phone, dateOfBirth } =
+      req.body;
 
-    if (typeof email !== "string" || typeof password !== "string") {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
+    if (
+      !email ||
+      !password ||
+      !firstName ||
+      !lastName ||
+      !postal ||
+      !phone ||
+      !dateOfBirth
+    ) {
+      return res.status(400).json({ message: "All fields required" });
     }
     if (password.length < 8) {
       return res
@@ -53,64 +124,44 @@ async function register(req, res) {
         .json({ message: "Password must be at least 8 characters" });
     }
 
-    const profile = {};
-    for (const field of REGISTER_FIELDS) {
-      if (req.body[field] !== undefined) profile[field] = req.body[field];
+    const dob = new Date(dateOfBirth);
+    const minDob = new Date();
+    minDob.setFullYear(minDob.getFullYear() - MIN_AGE);
+    if (Number.isNaN(dob.getTime()) || dob > minDob) {
+      return res.status(400).json({
+        message: `Invalid date of birth (you must be at least ${MIN_AGE})`,
+      });
     }
 
-    if (profile.dateOfBirth !== undefined) {
-      const dob = new Date(profile.dateOfBirth);
-      const minDob = new Date();
-      minDob.setFullYear(minDob.getFullYear() - MIN_AGE);
-      if (Number.isNaN(dob.getTime()) || dob > minDob) {
-        return res.status(400).json({
-          message: `Invalid date of birth (you must be at least ${MIN_AGE})`,
-        });
-      }
-    }
-
-    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedEmail = String(email).trim().toLowerCase();
     if (await User.exists({ email: normalizedEmail })) {
       return res.status(409).json({ message: "Email is already registered" });
     }
 
-    const now = new Date();
+    const profile = userTemplate();
     const user = await User.create({
       ...profile,
       email: normalizedEmail,
       password: await bcryptjs.hash(password, 12),
-      lastLoginAt: now,
-      consent: {
-        // Only recorded if the client explicitly sends acceptance
-        termsAcceptedAt: req.body.acceptTerms === true ? now : undefined,
-        privacyPolicyAcceptedAt:
-          req.body.acceptPrivacy === true ? now : undefined,
-        marketingOptIn: req.body.marketingOptIn === true,
-        personalizationOptIn: req.body.personalizationOptIn === true,
-      },
+      firstName,
+      lastName,
+      dateOfBirth: dob,
+      phone: String(phone),
+      location: { ...profile.location, postal: String(postal) },
     });
 
-    const accessToken = buildToken(
-      user,
-      ACCESS_EXPIRES,
-      process.env.JWT_SECRET_ACCESS,
-    );
-    const refreshToken = buildToken(
-      user,
-      REFRESH_EXPIRES,
-      process.env.JWT_SECRET_REFRESH,
-    );
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: REFRESH_COOKIE_MAX_AGE,
-    });
-
-    const { password: _password, ...safeUser } = user.toJSON();
-    res.status(201).json({ user: safeUser, accessToken });
+    res.status(201).json(startSession(res, user));
   } catch (err) {
+    // Two sign-ups with the same email at once: the unique index catches it
+    if (err.code === 11000) {
+      return res.status(409).json({ message: "Email is already registered" });
+    }
+    // Schema validation (bad phone, postal, email...): show the first message
+    if (err.name === "ValidationError") {
+      const first = Object.values(err.errors)[0];
+      return res.status(400).json({ message: first.message });
+    }
+    console.error(err);
     return res.status(500).json({ message: "user registration failed" });
   }
 }
@@ -120,39 +171,54 @@ async function login(req, res) {
     const { email, password } = req.body;
     if (!email || !password)
       return res.status(400).json({ message: "email and password required" });
-    const user = await User.findOne({ email });
-    const verified = bcryptjs.compareSync(password, user.password);
-    if (!user || !verified)
-      return res.status(401).json({ message: "mail or password incorrect" });
-    const refreshToken = buildToken(user, "1d", process.env.JWT_SECRET_REFRESH);
-    const accessToken = buildToken(user, "1h", process.env.JWT_SECRET_ACCESS);
-    res.cookie("jwt", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
+
+    const user = await User.findOne({
+      email: String(email).trim().toLowerCase(),
     });
-    res.json(accessToken);
+    // Check the user exists before touching user.password
+    if (!user || !(await bcryptjs.compare(password, user.password)))
+      return res.status(401).json({ message: "Email or password incorrect" });
+
+    user.lastLoginAt = new Date();
+    await user.save();
+
+    res.json(startSession(res, user));
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ message: "couldn't sign in" });
   }
 }
 
 async function refresh(req, res) {
+  const cookie = req.cookies?.jwt;
+  if (!cookie) {
+    return res.status(401).json({ message: "session expired" });
+  }
+
+  let decoded;
   try {
-    const cookie = req.cookies?.jwt;
+    // verify (not decode) checks the signature and expiry
+    decoded = jwt.verify(cookie, process.env.JWT_SECRET_REFRESH);
+  } catch {
+    res.clearCookie("jwt", COOKIE_OPTIONS);
+    return res.status(401).json({ message: "session expired" });
+  }
 
-    if (!cookie) {
-      return res.status(401).json({ message: "session expired" });
-    }
-
-    const decoded = jwt.decode(cookie, process.env.JWT_SECRET_REFRESH);
+  try {
     const user = await User.findById(decoded._id);
-
     if (!user) {
+      res.clearCookie("jwt", COOKIE_OPTIONS);
       return res.status(401).json({ message: "user doesn't exist" });
     }
+
+    user.lastActiveAt = new Date();
+    await user.save();
+
+    // Issues a new refresh cookie too, so active users stay signed in
+    res.json(startSession(res, user));
   } catch (err) {
-    return res.status(500).json({ err });
+    console.error(err);
+    return res.status(500).json({ message: "couldn't refresh session" });
   }
 }
 

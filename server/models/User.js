@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 
 const { Schema } = mongoose;
 
@@ -44,35 +43,56 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Password is required"],
     },
-    role: {
-      type: String,
-      enum: ["user", "moderator", "admin"],
-      default: "user",
-    },
-    emailVerified: { type: Boolean, default: false },
-    phoneVerified: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     isBanned: { type: Boolean, default: false },
     passwordChangedAt: Date,
     passwordResetToken: { type: String, select: false },
-    emailVerificationToken: { type: String, select: false },
     lastLoginAt: Date,
     lastActiveAt: Date,
-    firstName: { type: String, trim: true, maxlength: 50 },
-    lastName: { type: String, trim: true, maxlength: 50 },
+    firstName: {
+      type: String,
+      required: [true, "First name required"],
+      trim: true,
+      maxlength: 50,
+    },
+    lastName: {
+      type: String,
+      required: [true, "Last name required"],
+      trim: true,
+      maxlength: 50,
+    },
     bio: { type: String, trim: true, maxlength: 500 },
     gender: {
       type: String,
       enum: ["male", "female", "private"],
+      default: "private",
     },
-    dateOfBirth: Date,
-    phone: { type: String, trim: true, maxlength: 25 },
+    dateOfBirth: {
+      type: Date,
+      required: [true, "Date of birth required"],
+    },
+    // Stored as a string so formatting/leading digits are never lost
+    phone: {
+      type: String,
+      required: [true, "Phone number required"],
+      trim: true,
+      match: [/^\d{10}$/, "Phone number must be 10 digits"],
+    },
     avatar: { type: String, default: "" },
     coverImage: { type: String, default: "" },
-    photos: [{ type: String }],
+    photos: [
+      {
+        path: {
+          type: String,
+        },
+        uploadDate: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     languages: [{ type: String, trim: true }],
     interests: [{ type: String, trim: true, lowercase: true }],
-    hobbies: [{ type: String, trim: true }],
     website: { type: String, trim: true, maxlength: 300 },
     socialLinks: [linkSchema],
     relationshipStatus: {
@@ -89,8 +109,14 @@ const userSchema = new Schema(
     location: {
       city: { type: String, trim: true },
       state: { type: String, trim: true },
-      country: { type: String, trim: true },
-      timezone: { type: String, trim: true },
+      country: { type: String, trim: true, default: "US" },
+      // String, not Number, so ZIP codes like "02134" keep their leading zero
+      postal: {
+        type: String,
+        trim: true,
+        required: [true, "Postal code required"],
+        match: [/^\d{5}$/, "Postal code must be 5 digits"],
+      },
     },
     work: [
       {
@@ -137,32 +163,22 @@ const userSchema = new Schema(
       },
       showOnlineStatus: { type: Boolean, default: true },
     },
-    settings: {
-      language: { type: String, default: "en" },
-      theme: {
-        type: String,
-        enum: ["light", "dark", "system"],
-        default: "system",
-      },
-      notifications: {
-        email: { type: Boolean, default: true },
-        push: { type: Boolean, default: true },
-        friendRequests: { type: Boolean, default: true },
-        messages: { type: Boolean, default: true },
-        mentions: { type: Boolean, default: true },
-        marketing: { type: Boolean, default: false },
-      },
-    },
     consent: {
       termsAcceptedAt: Date,
       privacyPolicyAcceptedAt: Date,
-      marketingOptIn: { type: Boolean, default: false },
-      personalizationOptIn: { type: Boolean, default: false },
     },
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
+    toJSON: {
+      virtuals: true,
+      // Never send credentials to the client, even if they were selected
+      transform(doc, ret) {
+        delete ret.password;
+        delete ret.passwordResetToken;
+        return ret;
+      },
+    },
     toObject: { virtuals: true },
   },
 );

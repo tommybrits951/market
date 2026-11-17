@@ -1,0 +1,180 @@
+PRIVACY POLICY
+
+Effective Date: November 15, 2026
+
+[SITE NAME] ("we," "our," or "us") respects your privacy. This Privacy Policy explains how we collect, use, store, share, and protect information when you access or use our website, mobile applications, social networking features, and marketplace services.
+
+By using our Platform, you acknowledge this Privacy Policy.
+
+INFORMATION WE COLLECT
+
+We may collect the following categories of information:
+
+A. Account Information
+
+Full name or display name.
+Username.
+Email address.
+Phone number, if provided.
+Password credentials (stored securely).
+Profile photograph.
+Account preferences.
+
+B. Social Information
+
+Posts, comments, and reactions.
+Photos and videos.
+Followers and following relationships.
+Messages and interactions.
+Groups and community memberships.
+
+C. Marketplace Information
+
+Product listings.
+Product descriptions and photographs.
+Purchase and sales history.
+Shipping and delivery information.
+Transaction records.
+Payment status.
+
+We do not need to store full payment card details when payment processing is handled by an authorized third-party payment provider.
+
+D. Technical Information
+
+IP address.
+Browser type.
+Device information.
+Operating system.
+Access dates and times.
+Usage and diagnostic information.
+Cookies and similar technologies.
+HOW WE USE INFORMATION
+
+We use collected information to:
+
+Create and manage user accounts.
+Operate social networking features.
+Display profiles, posts, and listings.
+Facilitate marketplace transactions.
+Process payments through payment providers.
+Communicate with users.
+Respond to support requests.
+Prevent fraud, abuse, and unauthorized access.
+Improve our services.
+Enforce our Terms of Service.
+Comply with legal obligations.
+HOW INFORMATION IS SHARED
+
+We may share information with:
+
+A. Other Users
+
+Information you make public, including profile details, posts, comments, and marketplace listings, may be visible to other users.
+
+B. Service Providers
+
+We may share necessary information with companies that provide:
+
+Payment processing.
+Website hosting.
+Cloud storage.
+Email delivery.
+Customer support.
+Security and fraud prevention.
+Analytics services.
+
+C. Legal Authorities
+
+We may disclose information when required by law or when reasonably necessary to protect our users, Platform, or legal rights.
+
+D. Business Transfers
+
+Information may be transferred as part of a merger, acquisition, restructuring, or sale of business assets, subject to applicable law.
+
+We do not sell personal information in exchange for money. Where applicable law defines certain advertising or analytics disclosures as a sale or sharing of personal information, we will provide the required notices and choices.
+
+COOKIES AND TRACKING TECHNOLOGIES
+
+We may use cookies and similar technologies to:
+
+Maintain login sessions.
+Remember user preferences.
+Improve website functionality.
+Understand website traffic.
+Protect against suspicious activity.
+
+You can manage cookies through your browser and, where available, our cookie preference settings.
+
+DATA SECURITY
+
+We use reasonable administrative, technical, and organizational safeguards to protect personal information.
+
+These measures may include:
+
+Encrypted connections.
+Secure password storage.
+Access restrictions.
+Security monitoring.
+Regular system maintenance.
+
+However, no internet transmission or electronic storage method is guaranteed to be completely secure.
+
+DATA RETENTION
+
+We retain information for as long as reasonably necessary to:
+
+Provide our services.
+Maintain accounts.
+Complete transactions.
+Resolve disputes.
+Prevent fraud.
+Meet legal and regulatory requirements.
+
+When information is no longer required, we may delete or anonymize it, subject to legal retention obligations.
+
+YOUR PRIVACY RIGHTS
+
+Depending on your location and applicable law, you may have the right to:
+
+Request access to your personal information.
+Correct inaccurate information.
+Request deletion of personal information.
+Obtain a copy of certain personal information.
+Withdraw consent where processing relies on consent.
+Object to or restrict certain processing.
+Opt out of certain data sharing or targeted advertising.
+Appeal certain privacy-related decisions.
+
+To exercise applicable rights, contact us using the information below.
+
+CHILDREN'S PRIVACY
+
+Our Platform is intended for individuals who are at least 18 years old or the age of legal majority in their jurisdiction.
+
+We do not knowingly collect personal information from children in violation of applicable law.
+
+If we discover that we have collected such information unlawfully, we will take appropriate steps to delete it.
+
+THIRD-PARTY SERVICES
+
+Our Platform may link to external websites and services.
+
+We are not responsible for the privacy practices of third parties. Please review their privacy policies before providing information.
+
+INTERNATIONAL DATA TRANSFERS
+
+Your information may be processed or stored in countries other than your country of residence.
+
+Where required, we will implement appropriate safeguards for international transfers.
+
+CHANGES TO THIS POLICY
+
+We may update this Privacy Policy periodically.
+
+Changes will be reflected by updating the effective date. We will provide additional notice when required by law.
+
+CONTACT INFORMATION
+
+Platform Name: [SITE NAME] Company/Owner: [COMPANY OR OWNER NAME] Privacy Email: [PRIVACY EMAIL] Support Email: [SUPPORT EMAIL] Website: [WEBSITE URL] Business Address: [BUSINESS ADDRESS]
+
+END OF PRIVACY POLICY

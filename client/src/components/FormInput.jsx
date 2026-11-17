@@ -1,39 +1,38 @@
-import { inputClass } from "../utils/classes";
+const fieldClass =
+  "w-full rounded bg-white p-1 text-black focus:outline-none focus:ring-2 focus:ring-cyan-400";
 
-export default function FormInput(
+// Labelled form control. Renders an <input> by default, or a <select> /
+// <textarea> when `as` is set. `options` is [{ value, label }] for selects.
+export default function FormInput({
   label,
-  inputType,
-  name,
-  val,
-  func,
-  require,
-  options,
-) {
-  if (inputType === "select") {
-    return (
-      <label>
-        {label}
-        <select className={inputClass} name={name} value={val}>
-          {options.map((option, idx) => (
-            <option key={idx} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </label>
+  as = "input",
+  options = [],
+  className = "",
+  ...props
+}) {
+  let control;
+  if (as === "select") {
+    control = (
+      <select className={fieldClass} {...props}>
+        <option value="">-- Select --</option>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
     );
+  } else if (as === "textarea") {
+    control = <textarea className={fieldClass} {...props} />;
+  } else {
+    control = <input className={fieldClass} {...props} />;
   }
+
   return (
-    <label>
+    <label className={`block text-left text-lg text-white ${className}`}>
       {label}
-      <input
-        className={inputClass}
-        type={inputType}
-        name={name}
-        value={val}
-        onChange={func}
-        required={require}
-      />
+      {props.required && <span className="text-cyan-200"> *</span>}
+      {control}
     </label>
   );
 }

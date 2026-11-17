@@ -1,12 +1,11 @@
 import { useState } from "react";
 import "./App.css";
 import { Routes, Route } from "react-router";
-import Register from "./pages/Register";
 import Public from "./layouts/Public";
 import Private from "./layouts/Private";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
-
+import Register from "./pages/Register";
 function App() {
   return (
     <Routes>
